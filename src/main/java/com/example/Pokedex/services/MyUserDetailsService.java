@@ -12,6 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-10-25
+*/
+
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 

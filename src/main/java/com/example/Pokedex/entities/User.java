@@ -10,6 +10,12 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-10-25
+*/
+
 public class User {
     @Id
     private String id;

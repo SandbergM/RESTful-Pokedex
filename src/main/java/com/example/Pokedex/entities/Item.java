@@ -5,5 +5,8 @@ package com.example.Pokedex.entities;
         @since 2020-11-02
 */
 
-public class Item {
+import java.io.Serializable;
+
+public class Item implements Serializable {
+    private static final long serialVersionUID = 7270035226459372508L;
 }

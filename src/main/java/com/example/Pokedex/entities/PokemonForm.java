@@ -5,14 +5,17 @@ package com.example.Pokedex.entities;
         @since 2020-11-02
 */
 
-public class Form {
+import java.io.Serializable;
 
+public class PokemonForm implements Serializable {
+
+    private static final long serialVersionUID = 410066178078995190L;
     private String name;
     private String url;
 
-    public Form() {}
+    public PokemonForm() {}
 
-    public Form(String name, String url) {
+    public PokemonForm(String name, String url) {
         this.name = name;
         this.url = url;
     }
@@ -20,15 +23,12 @@ public class Form {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getUrl() {
         return url;
     }
-
     public void setUrl(String url) {
         this.url = url;
     }

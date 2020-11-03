@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-10-25
+*/
+
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {

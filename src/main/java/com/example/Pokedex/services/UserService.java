@@ -11,6 +11,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-10-25
+*/
+
 @Service
 public class UserService {
 
