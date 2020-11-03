@@ -50,6 +50,10 @@ public class PokemonRepo {
         return mongoTemplate.find(query, Pokemon.class);
     }
 
+    public List<Pokemon> findAll(){
+        return mongoTemplate.findAll(Pokemon.class);
+    }
+
     public Pokemon findById(String id){
         Query query = new Query().addCriteria(Criteria.where("_id").is(id));
         return mongoTemplate.findOne(query, Pokemon.class);

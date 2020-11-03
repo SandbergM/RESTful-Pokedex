@@ -48,8 +48,9 @@ public class PokemonService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, no matches found");
         }
 
-        if( result.isEmpty() ){
-            var partialNameSearchList = this.fetchPokemonNames();
+        var partialNameSearchList = this.fetchPokemonNames();
+
+        if( result.isEmpty() || partialNameSearchList.size() > 0){
             for(String pokemonName : partialNameSearchList){
                 if(pokemonName.contains(name)){
                     var savedPokemon = pokemonRepo.findByName(pokemonName);
@@ -94,16 +95,26 @@ public class PokemonService {
 
     @Cacheable( value = "pokemonApiNameCache", key="#name")
     public List<String> fetchPokemonNames(){
-        List<String> result = new ArrayList<>();
+
         String URL = "https://pokeapi.co/api/v2/pokemon/?limit=2000";
+        List<String> result = new ArrayList<>();
+        List<Pokemon> dbPokemons = pokemonRepo.findAll();
+        List<String> namesInDatabase = new ArrayList<>();
+
         var resultAsString = restTemplate.getForObject(URL, LinkedHashMap.class);
         assert resultAsString != null;
         ArrayList<?> resultAsArray = (ArrayList<?>) resultAsString.get("results");
 
+        for(Pokemon pokemon : dbPokemons){
+            namesInDatabase.add(pokemon.getName());
+        }
+
         for (Object obj : resultAsArray) {
             var x = obj.toString();
             var name = x.substring(x.indexOf("name=") + 5, x.indexOf(","));
-            result.add(name);
+            if(!namesInDatabase.contains(name)){
+                result.add(name);
+            }
         }
         return result;
     }
@@ -116,14 +127,16 @@ public class PokemonService {
         boolean hasCorrectAbility = ability.equals("");
 
         for(PokemonAbility a : pokemon.getAbilities()){
-            if(a.getAbility().get("name").equalsIgnoreCase(ability)){
+            if (a.getAbility().getName().equalsIgnoreCase(ability)) {
                 hasCorrectAbility = true;
+                break;
             }
         }
 
         for(PokemonType a : pokemon.getTypes()){
-            if(a.getType().get("name").equalsIgnoreCase(type)){
+            if (a.getType().getName().equalsIgnoreCase(type)) {
                 hasCorrectType = true;
+                break;
             }
         }
         return hasCorrectWeight && hasCorrectHeight && hasCorrectType && hasCorrectAbility;

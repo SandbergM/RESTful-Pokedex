@@ -6,25 +6,24 @@ package com.example.Pokedex.entities;
 */
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 public class PokemonAbility implements Serializable {
 
     private static final long serialVersionUID = -7904366260911860606L;
-    private HashMap<String, String> ability;
+    private NameAndUrl ability;
     private boolean is_hidden;
     private int slot;
 
-    public PokemonAbility(HashMap<String, String> ability, boolean is_hidden, int slot) {
+    public PokemonAbility(NameAndUrl ability, boolean is_hidden, int slot) {
         this.ability = ability;
         this.is_hidden = is_hidden;
         this.slot = slot;
     }
 
-    public HashMap<String, String> getAbility() {
+    public NameAndUrl getAbility() {
         return ability;
     }
-    public void setAbility(HashMap<String, String> ability) {
+    public void setAbility(NameAndUrl ability) {
         this.ability = ability;
     }
     public boolean isIs_hidden() {

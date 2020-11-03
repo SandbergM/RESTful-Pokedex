@@ -9,7 +9,7 @@
     <!-- Default cache template -->
     <cache-template name="default">
         <expiry>
-            <ttl unit="minutes">30</ttl>
+            <ttl unit="hours">2</ttl>
         </expiry>
         <listeners>
             <listener>
@@ -30,4 +30,5 @@
     <cache alias="pokemonCache" uses-template="default"/>
     <cache alias="itemCache" uses-template="default"/>
     <cache alias="pokemonApiNameCache" uses-template="default"/>
+    <cache alias="pokemonApiItemCache" uses-template="default"/>
 </config>

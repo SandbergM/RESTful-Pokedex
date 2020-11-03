@@ -5,6 +5,7 @@ import com.example.Pokedex.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -47,7 +48,8 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Id %s not found", id));
         }
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails)principal).getUsername();
 
         if(!username.equals(user.getUsername())){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized request");

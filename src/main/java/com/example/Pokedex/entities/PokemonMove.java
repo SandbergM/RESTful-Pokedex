@@ -12,18 +12,18 @@ import java.util.List;
 public class PokemonMove implements Serializable {
 
     private static final long serialVersionUID = -8897667837980649286L;
-    private HashMap<String, String> move;
+    private NameAndUrl move;
     private List<?> version_group_details;
 
-    public PokemonMove(HashMap<String, String> move, List<?> version_group_details) {
+    public PokemonMove(NameAndUrl move, List<?> version_group_details) {
         this.move = move;
         this.version_group_details = version_group_details;
     }
 
-    public HashMap<String, String> getMove() {
+    public NameAndUrl getMove() {
         return move;
     }
-    public void setMove(HashMap<String, String> move) {
+    public void setMove(NameAndUrl move) {
         this.move = move;
     }
     public List<?> getVersion_group_details() {

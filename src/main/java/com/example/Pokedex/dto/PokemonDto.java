@@ -13,7 +13,7 @@ public class PokemonDto {
 
     private List<PokemonAbility> abilities;
     private Integer base_experience;
-    private List<PokemonForm> forms;
+    private List<NameAndUrl> forms;
     private List<GameIndicy> game_indices;
     private Integer height;
     private List<PokemonItem> held_items;
@@ -31,7 +31,7 @@ public class PokemonDto {
     public PokemonDto(
             List<PokemonAbility> abilities,
             Integer base_experience,
-            List<PokemonForm> forms,
+            List<NameAndUrl> forms,
             List<GameIndicy> game_indices,
             Integer height,
             List<PokemonItem> held_items,
@@ -63,7 +63,7 @@ public class PokemonDto {
         return abilities;
     }
     public Integer getBase_experience() {return base_experience;}
-    public List<PokemonForm> getForms() {return forms;}
+    public List<NameAndUrl> getForms() {return forms;}
     public List<GameIndicy> getGame_indices() {return game_indices;}
     public Integer getHeight() {return height;}
     public List<PokemonItem> getHeld_items() {return held_items;}

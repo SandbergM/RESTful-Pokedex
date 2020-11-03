@@ -4,12 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Scanner;
+
 @SpringBootApplication
 @EnableSwagger2
 public class ResTfulPokedexApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ResTfulPokedexApplication.class, args);
-		System.out.println("Server running on port 8080");
+			SpringApplication.run(ResTfulPokedexApplication.class, args);
+			System.out.println("Server running on port 8080");
 	}
 }

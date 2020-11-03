@@ -5,6 +5,4 @@ import com.example.Pokedex.entities.Pokemon;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface PokemonMapper {
-    Pokemon pokemonDtoToPokemon(PokemonDto pokemonDto);
-}
+public interface PokemonMapper { Pokemon pokemonDtoToPokemon(PokemonDto pokemonDto); }

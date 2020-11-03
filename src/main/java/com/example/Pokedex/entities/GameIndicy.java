@@ -6,14 +6,13 @@ package com.example.Pokedex.entities;
 */
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 public class GameIndicy implements Serializable {
 
     private int game_index;
-    private HashMap<String, String> version;
+    private NameAndUrl version;
 
-    public GameIndicy(int game_index, HashMap<String, String> version) {
+    public GameIndicy(int game_index, NameAndUrl version) {
         this.game_index = game_index;
         this.version = version;
     }
@@ -21,16 +20,13 @@ public class GameIndicy implements Serializable {
     public int getGame_index() {
         return game_index;
     }
-
     public void setGame_index(int game_index) {
         this.game_index = game_index;
     }
-
-    public HashMap<String, String> getVersion() {
+    public NameAndUrl getVersion() {
         return version;
     }
-
-    public void setVersion(HashMap<String, String> version) {
+    public void setVersion(NameAndUrl version) {
         this.version = version;
     }
 }
