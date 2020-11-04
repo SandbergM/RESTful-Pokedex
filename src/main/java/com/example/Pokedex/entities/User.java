@@ -3,6 +3,7 @@ package com.example.Pokedex.entities;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotEmpty;
@@ -18,11 +19,17 @@ import java.util.List;
 
 public class User {
     @Id
+    @Schema(description = "The _id that MongoDb uses", example = "1")
     private String id;
+    @Schema(description = "The users first name", example = "John")
     private String firstName;
+    @Schema(description = "The users last name", example = "Doe")
     private String lastName;
+    @NotEmpty
+    @Schema(description = "The unique username that is used to login", example = "John_Doe", required = true)
     private String username;
     @NotEmpty
+    @Schema(description = "The email belonging to the user", example = "John_Doe@mail.com", required = true)
     private String email;
     @NotEmpty @Size(min = 8, max = 12)
     private String password;

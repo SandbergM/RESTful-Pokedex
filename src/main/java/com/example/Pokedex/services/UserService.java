@@ -45,14 +45,14 @@ public class UserService {
 
     public void updateUser(String id, User user) {
         if(!userRepo.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Id %s not found", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
         }
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((UserDetails)principal).getUsername();
 
         if(!username.equals(user.getUsername())){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized request");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -62,7 +62,7 @@ public class UserService {
 
     public void deleteUser(String id) {
         if(!userRepo.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Id %s not found", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
         }
         userRepo.deleteById(id);
     }
@@ -76,6 +76,10 @@ public class UserService {
     }
 
     public User findByUsername(String username) {
-        return userRepo.findByUsername(username);
+        var user = userRepo.findByUsername(username);
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
+        }
+        return user;
     }
 }

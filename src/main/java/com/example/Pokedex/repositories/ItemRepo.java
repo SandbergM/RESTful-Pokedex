@@ -1,7 +1,6 @@
 package com.example.Pokedex.repositories;
 
 import com.example.Pokedex.entities.Item;
-import com.example.Pokedex.entities.Pokemon;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -9,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ItemRepo {
@@ -20,7 +20,7 @@ public class ItemRepo {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public List<Item> itemDatabaseCriteriaSearch(String name, int minCost, int maxCost, int page){
+    public Optional<List<Item>> itemDatabaseCriteriaSearch(String name, int minCost, int maxCost, int page){
         Query query = new Query();
 
         if(minCost != Integer.MIN_VALUE || maxCost != Integer.MAX_VALUE){
@@ -31,30 +31,26 @@ public class ItemRepo {
                 .with( Sort.by( "name" ) )
                 .limit( PAGE_LIMIT )
                 .skip( ( page - 1 ) * PAGE_LIMIT );
-
-        return mongoTemplate.find(query, Item.class);
+        return Optional.of(mongoTemplate.find(query, Item.class));
     }
 
-    public List<Item> findAll(){
-        return mongoTemplate.findAll(Item.class);
+    public Optional<Item> save(Item item){
+        return Optional.of(mongoTemplate.save(item));
     }
 
-    public Item save(Item item){
-        return mongoTemplate.save(item);
-    }
-
-    public List<Item> findByName(String name){
-        Query query = new Query().addCriteria(Criteria.where("name").is(name));
-        return mongoTemplate.find(query, Item.class);
-    }
-
-    public Item findById(String id){
+    public Optional<Item> findById(String id){
         Query query = new Query().addCriteria(Criteria.where("_id").is(id));
-        return mongoTemplate.findOne(query, Item.class);
+        return Optional.ofNullable(mongoTemplate.findOne(query, Item.class));
     }
 
     public void deleteById(String id){
         Query query = new Query().addCriteria(Criteria.where("_id").is(id));
         mongoTemplate.findAndRemove(query, Item.class);
     }
+
+    public Boolean findOneWithName(String name){
+        Query query = new Query().addCriteria(Criteria.where("name").is(name));
+        return mongoTemplate.findOne(query, Item.class ) != null;
+    }
+
 }

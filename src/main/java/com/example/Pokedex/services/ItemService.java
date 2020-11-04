@@ -39,81 +39,68 @@ public class ItemService {
     }
 
     @Cacheable(value = "itemCache")
-    public List<Item> itemSearch(String name, int minCost, int maxCost, int page){
+    public List<Item> itemSearch( String name, int minCost, int maxCost, int page, boolean firstSearch ){
 
-        var result = itemRepo.itemDatabaseCriteriaSearch(name, minCost, maxCost, page);
+        List<Item> result = itemRepo.itemDatabaseCriteriaSearch(name, minCost, maxCost, page).orElse(new ArrayList<>());
 
-        var partialNameSearchList = this.fetchItemNames();
-
-        System.out.println(partialNameSearchList.size());
-
-        if( result.isEmpty() || partialNameSearchList.size() > 0){
-            for(String itemName : partialNameSearchList){
-                if(itemName.contains(name)){
-                    var savedItem = itemRepo.findByName(itemName);
-                    if(savedItem.isEmpty()){
-                        var itemDto = itemConsumerService.searchByName(itemName);
-                        var item = this.assembleItem(itemDto);
-                        if(this.valueCheck(item, minCost, maxCost)){
-                            result.add(item);
-                        }
-                        System.out.println("Item added to DB");
-                        this.save(item);
-                    }
+        // If (this is the first search or result doesn't have any pokemon's) and ( the result has less than 50 pokemon's )
+        // if you only check if result is empty or not you could loose x amount of pokemon's in every search
+        // if i get at least 1 hit from the database, the result is a bit more traffic towards PokeApi, however
+        // the search results will be A LOT more accurate and return a lot more data
+        // I only fetch a list with all of the names of the items that are provided by PokeApi, but i only
+        // fetch the entire object if it matches a users search criteras
+        if( (firstSearch || result.isEmpty()) && result.size() < 50){
+            var names = this.fetchItemNames();
+            for(String itemName : names){
+                if(itemName.contains(name) && !itemRepo.findOneWithName(itemName)){
+                    var itemDto = itemConsumerService.searchByName(itemName);
+                    var item = itemMapper.map(itemDto);
+                    result.add(this.save(item));
                 }
             }
+            this.itemSearch(name, minCost, maxCost, page,false);
         }
 
         if(result.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, no matches found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
         }
         return result;
     }
 
     @CacheEvict(value = "itemCache", key="#result.id", allEntries = true)
     public Item save(Item item){
-        return itemRepo.save(item);
+        return itemRepo.save(item).orElse(null );
     }
 
     @CachePut(value = "itemCache", key = "#id")
     public void update(String id, Item item){
-        if(itemRepo.findById(id) == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find item with id : " + id);
+        if(itemRepo.findById(id).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
         }
         itemRepo.save(item);
     }
 
     @CacheEvict(value = "itemCache", allEntries = true)
     public void delete(String id){
-        if(itemRepo.findById(id) == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find item with id : " + id);
+        if(itemRepo.findById(id).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
         }
         itemRepo.deleteById(id);
     }
 
     @Cacheable( value = "pokemonApiItemCache", key="#name")
     public List<String> fetchItemNames(){
-
-        List<String> result = new ArrayList<>();
-        List<Item> dbItems = itemRepo.findAll();
-        List<String> namesInDatabase = new ArrayList<>();
-
         String URL = "https://pokeapi.co/api/v2/item/?limit=2000";
+        List<String> result = new ArrayList<>();
+
         var resultAsString = restTemplate.getForObject(URL, LinkedHashMap.class);
         assert resultAsString != null;
         List<?> resultAsArray = (List<?>) resultAsString.get("results");
 
-        for(Item item : dbItems){
-            namesInDatabase.add(item.getName());
-        }
-
         for (Object obj : resultAsArray) {
             var x = obj.toString();
             var name = x.substring(x.indexOf("name=") + 5, x.indexOf(","));
-           if(!namesInDatabase.contains(name)){
-               System.out.println("added");
-                result.add(name);
-            }
+            result.add(name);
         }
         return result;
     }
@@ -123,6 +110,18 @@ public class ItemService {
         boolean isNotToCheap = minCost == Integer.MIN_VALUE || minCost <= item.getCost();
         boolean isNotToExpensive = maxCost == Integer.MAX_VALUE || maxCost >= item.getCost();
         return isNotToCheap && isNotToExpensive;
+    }
+
+    // Helper to make partial-name search work with the PokeAPI, since they don't
+    // support it them self, if a match is found, i save it to my own database.
+    public void checkForUpdatesInPokeApi(List<String> names, String nameSearched){
+        for(String itemName : names){
+            if(itemName.contains(nameSearched)){
+                var itemDto = itemConsumerService.searchByName(itemName);
+                var item = this.assembleItem(itemDto);
+                this.save(item);
+            }
+        }
     }
 
     public Item assembleItem(ItemDto itemDto){

@@ -6,6 +6,7 @@ package com.example.Pokedex.entities;
         @since 2020-11-02
 */
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -16,11 +17,15 @@ public class Item implements Serializable {
     private static final long serialVersionUID = 7270035226459372508L;
 
     @Id
+    @Schema(description = "The _id used by MongoDb", example = "5fa265933abf5a24d97169d7")
     private String id;
+    @Schema(description = "The id from PokeApi", example = "10034")
     private Integer poke_api_id;
     private List<NameAndUrl> attributes;
     private NameAndUrl category;
+    @Schema(description = "The cost of an item", example = "10000")
     private Integer cost;
+    @Schema(description = "The name of an item", example = "master-ball")
     private String name;
 
     public Item() {

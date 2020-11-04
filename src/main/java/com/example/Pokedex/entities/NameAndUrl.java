@@ -5,11 +5,16 @@ package com.example.Pokedex.entities;
         @since 2020-11-03
 */
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 
 public class NameAndUrl implements Serializable {
     private static final long serialVersionUID = -1527438535573075202L;
+
+    @Schema(description = "Displays basic data, name", example = "charizard")
     private String name;
+    @Schema(description = "Displays basic data, url", example = "https://pokeapi.co/api/v2/pokemon-form/6/")
     private String url;
 
     public NameAndUrl() {}

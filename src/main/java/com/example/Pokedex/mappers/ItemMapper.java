@@ -11,4 +11,14 @@ import org.mapstruct.Mapper;
 */
 
 @Mapper
-public interface ItemMapper { Item itemDtoToItem(ItemDto itemDto); }
+public interface ItemMapper {
+    default Item map(ItemDto itemDto){
+        return new Item(
+                itemDto.getId(),
+                itemDto.getAttributes(),
+                itemDto.getCategory(),
+                itemDto.getCost(),
+                itemDto.getName()
+        );
+    }
+}

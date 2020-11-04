@@ -5,6 +5,8 @@ package com.example.Pokedex.entities;
         @since 2020-10-25
 */
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;

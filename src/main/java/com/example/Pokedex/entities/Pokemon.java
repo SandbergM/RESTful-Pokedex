@@ -1,7 +1,9 @@
 package com.example.Pokedex.entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.annotation.Id;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,40 +16,59 @@ import java.util.List;
 public class Pokemon implements Serializable {
 
     private static final long serialVersionUID = 1465007962309070468L;
+    @Schema(description = "Pokemon unique identifier id",example = "5fa265933abf5a24d97169d7", required = true)
     @Id
+    @NotNull
     private String id;
+    @Schema(description = "Array with a pokemon's ability's")
     private List<PokemonAbility> abilities;
+    @Schema(description = "A pokemon's base experience",example = "285")
     private Integer base_experience;
+    @Schema(description = "Array with a pokemon's forms")
     private List<NameAndUrl> forms;
     private List<GameIndicy> game_indices;
+    @Schema(description = "The pokemon's height", example = "17")
     private Integer height;
+    @Schema(description = "Array with the items a pokemon possesses")
     private List<PokemonItem> held_items;
-    private Integer poke_api_id;
+    @Schema(description = "Pokemon unique identifier id from PokeApi", example = "10034")
+    private String poke_api_id;
+    @Schema(description = "Shows if the pokemon is default to the game or not")
     private Boolean is_default;
+    @Schema(description = "Url to the location the pokemon might be found in",
+            example = "https://pokeapi.co/api/v2/pokemon/10034/encounters")
     private String location_area_encounters;
+    @Schema(description = "Array with all of the moves the pokemon has")
     private List<PokemonMove> moves;
+    @Schema(description = "The pokemon's name", example = "Charizard")
     private String name;
+    @Schema(description = "Array with all of the types the pokemon belongs to")
     private List<PokemonType> types;
+    @Schema(description = "The pokemon's order in the in game pokedex", example = "9")
     private Integer order;
+    @Schema(description = "The pokemon's weight", example = "905")
     private Integer weight;
 
+    public Pokemon() {}
+
     public Pokemon(
-            String name,
+
             List<PokemonAbility> abilities,
             Integer base_experience,
             List<NameAndUrl> forms,
             List<GameIndicy> game_indices,
             Integer height,
             List<PokemonItem> held_items,
-            Integer poke_api_id,
+            String poke_api_id,
             Boolean is_default,
             String location_area_encounters,
             List<PokemonMove> moves,
+            String name,
             List<PokemonType> types,
             Integer order,
             Integer weight
     ) {
-        this.name = name;
+
         this.abilities = abilities;
         this.base_experience = base_experience;
         this.forms = forms;
@@ -58,23 +79,27 @@ public class Pokemon implements Serializable {
         this.is_default = is_default;
         this.location_area_encounters = location_area_encounters;
         this.moves = moves;
+        this.name = name;
         this.types = types;
         this.order = order;
         this.weight = weight;
+        
     }
-
-    public Pokemon() {}
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
-
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
+    }
+    public String getPoke_api_id() {
+        return poke_api_id;
+    }
+    public void setPoke_api_id(String poke_api_id) {
+        this.poke_api_id = poke_api_id;
     }
     public List<PokemonAbility> getAbilities() {
         return abilities;
@@ -111,12 +136,6 @@ public class Pokemon implements Serializable {
     }
     public void setHeld_items(List<PokemonItem> held_items) {
         this.held_items = held_items;
-    }
-    public Integer getPoke_api_id() {
-        return poke_api_id;
-    }
-    public void setPoke_api_id(Integer poke_api_id) {
-        this.poke_api_id = poke_api_id;
     }
     public Boolean getIs_default() {
         return is_default;

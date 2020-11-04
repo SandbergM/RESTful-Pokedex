@@ -16,6 +16,6 @@ public class RestErrorHandler {
 
     @ExceptionHandler(HttpClientErrorException.NotFound.class)
     public ResponseEntity<String> handleNotFound(HttpClientErrorException.NotFound e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sorry can't find that");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
     }
 }

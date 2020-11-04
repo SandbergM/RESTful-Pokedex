@@ -23,7 +23,6 @@ import java.util.*;
         @author Marcus Sandberg
         @since 2020-10-26
 */
-
 @Service
 public class PokemonService {
 
@@ -34,106 +33,78 @@ public class PokemonService {
     private final RestTemplate restTemplate;
     private final PokemonConsumerService pokemonConsumerService;
 
-    public PokemonService(RestTemplateBuilder restTemplateBuilder, PokemonConsumerService pokemonConsumerService){
+    public PokemonService(RestTemplateBuilder restTemplateBuilder, PokemonConsumerService pokemonConsumerService) {
         this.restTemplate = restTemplateBuilder.build();
         this.pokemonConsumerService = pokemonConsumerService;
     }
 
     @Cacheable(value = "pokemonCache")
-    public List<Pokemon> pokemonSearch(String name, String type, int weight, int height, String ability, int page){
+    public List<Pokemon> pokemonSearch(String name, String type, int weight, int height, String ability, int page, Boolean firstSearch) {
 
-        var result = pokemonRepo.pokemonDatabaseCriteriaSearch(name, type, weight, height, ability, page);
-
-        if(page > 1 && result.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, no matches found");
-        }
-
-        var partialNameSearchList = this.fetchPokemonNames();
-
-        if( result.isEmpty() || partialNameSearchList.size() > 0){
-            for(String pokemonName : partialNameSearchList){
-                if(pokemonName.contains(name)){
-                    var savedPokemon = pokemonRepo.findByName(pokemonName);
-                    if(savedPokemon.isEmpty()){
-                        var pokemonDto = pokemonConsumerService.searchByName(pokemonName);
-                        var pokemon = this.assemblePokemon(pokemonDto);
-                        if( this.valueCheck(pokemon, type, weight, height, ability) ){
-                            result.add(pokemon);
-                        }
-                        this.save(pokemon);
-                    }
+        var result = pokemonRepo.pokemonDatabaseCriteriaSearch(name, type, weight, height, ability, page)
+                .orElse(new ArrayList<>());
+        // If (this is the first search or result doesn't have any pokemon's) and ( the result has less than 50 pokemon's )
+        // if you only check if result is empty or not you could loose x amount of pokemon's in every search
+        // if i get at least 1 hit from the database, the result is a bit more traffic towards PokeApi, however
+        // the search results will be A LOT more accurate and return a lot more data
+        // I only fetch a list with all of the names of the pokemon's that are provided by PokeApi, but i only
+        // fetch the entire object if it matches a users search criteras
+        if ((firstSearch || result.isEmpty()) && result.size() < 50) {
+            var names = this.fetchPokemonNames();
+            for (String pokemonName : names) {
+                if (pokemonName.contains(name) && !pokemonRepo.findOneWithName(pokemonName)) {
+                    var pokemonDto = pokemonConsumerService.searchByName(pokemonName);
+                    Pokemon pokemon = pokemonMapper.map(pokemonDto);
+                    result.add(this.save(pokemon));
                 }
             }
+            this.pokemonSearch(name, type, weight, height, ability, page, false);
         }
 
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, no matches found");
         }
+
         return result;
     }
 
-    @CacheEvict(value = "pokemonCache", key="#result.id", allEntries = true)
-    public Pokemon save(Pokemon pokemon){
-        return pokemonRepo.save(pokemon);
+    @CacheEvict(value = "pokemonCache", key = "#result.id", allEntries = true)
+    public Pokemon save(Pokemon pokemon) {
+        return pokemonRepo.save(pokemon).orElse(null);
     }
 
     @CachePut(value = "pokemonCache", key = "#id")
-    public void update(String id, Pokemon pokemon){
-        if(pokemonRepo.findById(id) == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find pokemon with id : " + id);
+    public void update(String id, Pokemon pokemon) {
+        if (pokemonRepo.findById(id).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, couldn't find pokemon with that id");
         }
         pokemonRepo.save(pokemon);
     }
 
     @CacheEvict(value = "pokemonCache", allEntries = true)
-    public void delete(String id){
-        if(pokemonRepo.findById(id) == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find pokemon with id : " + id);
+    public void delete(String id) {
+        if (pokemonRepo.findById(id).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, couldn't find pokemon with that id");
         }
         pokemonRepo.deleteById(id);
     }
 
-    @Cacheable( value = "pokemonApiNameCache", key="#name")
-    public List<String> fetchPokemonNames(){
-
-        String URL = "https://pokeapi.co/api/v2/pokemon/?limit=2000";
-        List<String> result = new ArrayList<>();
-        List<Pokemon> dbPokemons = pokemonRepo.findAll();
-        List<String> namesInDatabase = new ArrayList<>();
-
-        var resultAsString = restTemplate.getForObject(URL, LinkedHashMap.class);
-        assert resultAsString != null;
-        ArrayList<?> resultAsArray = (ArrayList<?>) resultAsString.get("results");
-
-        for(Pokemon pokemon : dbPokemons){
-            namesInDatabase.add(pokemon.getName());
-        }
-
-        for (Object obj : resultAsArray) {
-            var x = obj.toString();
-            var name = x.substring(x.indexOf("name=") + 5, x.indexOf(","));
-            if(!namesInDatabase.contains(name)){
-                result.add(name);
-            }
-        }
-        return result;
-    }
-
-    // Hacky way of getting a fake "multiple param-search" with the pokemon-api.
-    public boolean valueCheck(Pokemon pokemon, String type,  int weight, int height, String ability ){
+    // PokeAPI only support id / name(full) search, when a user does a search without a name this
+    // method checks any of the fetched pokemon's matches the criteria(weight, height, type, ability)
+    public boolean valueCheck(Pokemon pokemon, String type, int weight, int height, String ability) {
         boolean hasCorrectType = type.equals("");
         boolean hasCorrectWeight = pokemon.getWeight() == weight || weight == -1;
-        boolean hasCorrectHeight = pokemon.getHeight() == height || height == -1;
+        boolean hasCorrectHeight = pokemon.getWeight() == height || height == -1;
         boolean hasCorrectAbility = ability.equals("");
 
-        for(PokemonAbility a : pokemon.getAbilities()){
+        for (PokemonAbility a : pokemon.getAbilities()) {
             if (a.getAbility().getName().equalsIgnoreCase(ability)) {
                 hasCorrectAbility = true;
                 break;
             }
         }
 
-        for(PokemonType a : pokemon.getTypes()){
+        for (PokemonType a : pokemon.getTypes()) {
             if (a.getType().getName().equalsIgnoreCase(type)) {
                 hasCorrectType = true;
                 break;
@@ -142,22 +113,23 @@ public class PokemonService {
         return hasCorrectWeight && hasCorrectHeight && hasCorrectType && hasCorrectAbility;
     }
 
-    public Pokemon assemblePokemon(PokemonDto pokemonDto){
-        return new Pokemon(
-                pokemonDto.getName(),
-                pokemonDto.getAbilities(),
-                pokemonDto.getBase_experience(),
-                pokemonDto.getForms(),
-                pokemonDto.getGame_indices(),
-                pokemonDto.getHeight(),
-                pokemonDto.getHeld_items(),
-                pokemonDto.getId(),
-                pokemonDto.getIs_default(),
-                pokemonDto.getLocation_area_encounters(),
-                pokemonDto.getMoves(),
-                pokemonDto.getTypes(),
-                pokemonDto.getOrder(),
-                pokemonDto.getWeight()
-        );
+    // Fetch all of the pokemon-names from the API and store it in cache to lower the traffic to PokeAPI
+    // but only saves the names of the pokemon's that doesn't already exist in my own database
+    // this list is used in checkForUpdatesInPokeApi() to check a users search needs any of the pokemon's
+    // from PokeAPI that i've not already saved in my database.
+    @Cacheable(value = "pokemonApiNameCache", key = "#name")
+    public List<String> fetchPokemonNames() {
+        String URL = "https://pokeapi.co/api/v2/pokemon/?limit=2000";
+        List<String> result = new ArrayList<>();
+        var resultAsString = restTemplate.getForObject(URL, LinkedHashMap.class);
+        assert resultAsString != null;
+        ArrayList<?> resultAsArray = (ArrayList<?>) resultAsString.get("results");
+
+        for (Object obj : resultAsArray) {
+            var x = obj.toString();
+            var name = x.substring(x.indexOf("name=") + 5, x.indexOf(","));
+            result.add(name);
+        }
+        return result;
     }
 }

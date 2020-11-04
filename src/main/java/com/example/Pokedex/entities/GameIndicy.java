@@ -5,10 +5,13 @@ package com.example.Pokedex.entities;
         @since 2020-11-02
 */
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 
 public class GameIndicy implements Serializable {
 
+    @Schema(description = "Game index from PokeApi", example = "180")
     private int game_index;
     private NameAndUrl version;
 
