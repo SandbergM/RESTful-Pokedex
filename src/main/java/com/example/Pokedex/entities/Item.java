@@ -1,31 +1,32 @@
 package com.example.Pokedex.entities;
 
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.data.annotation.Id;
+
+import java.io.Serializable;
+import java.util.List;
+
 /*
         <description>
         @author Marcus Sandberg
         @since 2020-11-02
 */
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.data.annotation.Id;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 public class Item implements Serializable {
     private static final long serialVersionUID = 7270035226459372508L;
 
     @Id
-    @Schema(description = "The _id used by MongoDb", example = "5fa265933abf5a24d97169d7")
+    @ApiModelProperty( notes = "The MongoDb _id" )
     private String id;
-    @Schema(description = "The id from PokeApi", example = "10034")
+    @ApiModelProperty( notes = "The item's id on PokeApi" )
     private Integer poke_api_id;
+    @ApiModelProperty( notes = "Contains a item's attributes" )
     private List<NameAndUrl> attributes;
+    @ApiModelProperty( notes = "The item's category" )
     private NameAndUrl category;
-    @Schema(description = "The cost of an item", example = "10000")
+    @ApiModelProperty( notes = "The item's cost" )
     private Integer cost;
-    @Schema(description = "The name of an item", example = "master-ball")
+    @ApiModelProperty( notes = "The item's name" )
     private String name;
 
     public Item() {

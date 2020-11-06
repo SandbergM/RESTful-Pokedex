@@ -1,14 +1,11 @@
 package com.example.Pokedex.controllers;
 
-import com.example.Pokedex.entities.Item;
 import com.example.Pokedex.entities.User;
 import com.example.Pokedex.services.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,55 +23,35 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users/")
+@Api( tags = "User Controller" )
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @Operation( summary = "Search for a user in the database with a specific username", tags = "user")
+    @ApiOperation(value = "Search for a user in the database with a specific username")
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successful operation",
-                    content = @Content(  array = @ArraySchema( schema = @Schema(implementation = User.class) ) ) ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Full authentication is required to access this resource",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Not found",
-                    content = @Content )
+            @ApiResponse( code = 200, message = "Successful operation" ),
+            @ApiResponse( code = 401, message = "Full authentication is required to access this resource" ),
+            @ApiResponse( code = 403, message = "Forbidden"  ),
+            @ApiResponse( code = 404, message = "Not found" )
     } )
     @GetMapping
     @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<List<User>> findByUsername(@PathVariable(required = false) String username){
-        var users = userService.findAll(username);
+    public ResponseEntity<List<User>> userSearch(
+            @RequestParam(required = false, defaultValue = "") String username
+    ){
+        System.out.println("test");
+        var users = userService.userSearch(username);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @Operation( summary = "Register / Add a new account to the database", tags = "user" )
+    @ApiOperation( value = "Register / Add a new account to the database")
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successful operation",
-                    content = @Content(  array = @ArraySchema( schema = @Schema(implementation = User.class) ) ) ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Full authentication is required to access this resource",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Not found",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Conflict, already in use",
-                    content = @Content )
+            @ApiResponse( code = 200, message = "Successful operation" ),
+            @ApiResponse( code = 401, message = "Full authentication is required to access this resource" ),
+            @ApiResponse( code = 404, message = "Not found" ),
+            @ApiResponse( code = 409, message = "Conflict, already in use" )
     } )
     @PostMapping
     @Secured({"ROLE_ADMIN"})
@@ -82,63 +59,38 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(user));
     }
 
-    @Operation( summary = "Update / Put account in the database with a specific id", tags = "user" )
+    @ApiOperation( value = "Update / Put account in the database with a specific id")
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Successful operation",
-                    content = @Content(  array = @ArraySchema( schema = @Schema(implementation = User.class) ) ) ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad Request",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Full authentication is required to access this resource",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Not found",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Conflict, already in use",
-                    content = @Content )
+            @ApiResponse( code = 201, message = "Successful operation" ),
+            @ApiResponse( code = 400, message = "Bad Request" ),
+            @ApiResponse( code = 401, message = "Full authentication is required to access this resource" ),
+            @ApiResponse( code = 403, message = "Forbidden" ),
+            @ApiResponse( code = 404, message = "Not found" ),
+            @ApiResponse( code = 409, message = "Conflict, already in use" )
     } )
     @PutMapping("{id}")
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUser(@PathVariable String id,@Validated @RequestBody User user){
+    public void updateUser(
+            @PathVariable String id,
+            @Validated @RequestBody User user
+    ){
         userService.updateUser(id, user);
     }
 
-    @Operation( summary = "Delete / Remove account from the database with a specific id", tags = "user" )
+    @ApiOperation( value = "Delete / Remove account from the database with a specific id")
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Successful operation",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Full authentication is required to access this resource",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Not found",
-                    content = @Content )
+            @ApiResponse( code = 204, message = "Successful operation" ),
+            @ApiResponse( code = 401, message = "Full authentication is required to access this resource" ),
+            @ApiResponse( code = 403, message = "Forbidden" ),
+            @ApiResponse( code = 404, message = "Not found" )
     } )
     @DeleteMapping("{id}")
     @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable String id){
+    public void deleteUser(
+            @PathVariable String id
+    ){
         userService.deleteUser(id);
     }
 }

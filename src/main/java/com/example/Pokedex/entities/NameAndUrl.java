@@ -1,20 +1,21 @@
 package com.example.Pokedex.entities;
+
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+
 /*
         <description>
         @author Marcus Sandberg
         @since 2020-11-03
 */
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.io.Serializable;
-
 public class NameAndUrl implements Serializable {
     private static final long serialVersionUID = -1527438535573075202L;
 
-    @Schema(description = "Displays basic data, name", example = "charizard")
+    @ApiModelProperty( notes = "Basic info, name" )
     private String name;
-    @Schema(description = "Displays basic data, url", example = "https://pokeapi.co/api/v2/pokemon-form/6/")
+    @ApiModelProperty( notes = "Basic info, url" )
     private String url;
 
     public NameAndUrl() {}

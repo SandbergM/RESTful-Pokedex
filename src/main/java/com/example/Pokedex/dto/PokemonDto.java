@@ -1,14 +1,14 @@
 package com.example.Pokedex.dto;
 
+import com.example.Pokedex.entities.*;
+
+import java.util.List;
+
 /*
         <description>
         @author Marcus Sandberg
         @since 2020-10-26
 */
-
-import com.example.Pokedex.entities.*;
-
-import java.util.List;
 
 public class PokemonDto {
     private List<PokemonAbility> abilities;

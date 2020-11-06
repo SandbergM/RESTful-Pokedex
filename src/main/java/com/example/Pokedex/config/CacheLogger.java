@@ -1,15 +1,15 @@
 package com.example.Pokedex.config;
 
+import org.ehcache.event.CacheEvent;
+import org.ehcache.event.CacheEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*
         <description>
         @author Marcus Sandberg
         @since 2020-10-27
 */
-
-import org.ehcache.event.CacheEvent;
-import org.ehcache.event.CacheEventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CacheLogger implements CacheEventListener<Object, Object> {
     private final Logger LOG = LoggerFactory.getLogger(CacheLogger.class);

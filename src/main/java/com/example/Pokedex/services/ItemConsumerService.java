@@ -1,16 +1,16 @@
 package com.example.Pokedex.services;
 
-/*
-        <description>
-        @author Marcus Sandberg
-        @since 2020-11-03
-*/
-
 import com.example.Pokedex.dto.ItemDto;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-11-03
+*/
 
 @Service
 @ConfigurationProperties(value = "example.item", ignoreUnknownFields = false)

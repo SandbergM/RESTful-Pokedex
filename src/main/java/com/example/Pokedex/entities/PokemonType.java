@@ -1,17 +1,18 @@
 package com.example.Pokedex.entities;
+
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+
 /*
         <description>
         @author Marcus Sandberg
         @since 2020-11-01
 */
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.io.Serializable;
-
 public class PokemonType implements Serializable {
     private static final long serialVersionUID = -833422101021159608L;
-    @Schema(description = "The slot of the pokemon in the PokemonType array", example = "1")
+    @ApiModelProperty( notes = "Shows what slot the type is in" )
     private int slot;
     private NameAndUrl type;
 

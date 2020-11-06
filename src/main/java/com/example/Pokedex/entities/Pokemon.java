@@ -1,6 +1,6 @@
 package com.example.Pokedex.entities;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
@@ -16,37 +16,37 @@ import java.util.List;
 public class Pokemon implements Serializable {
 
     private static final long serialVersionUID = 1465007962309070468L;
-    @Schema(description = "Pokemon unique identifier id",example = "5fa265933abf5a24d97169d7", required = true)
     @Id
     @NotNull
+    @ApiModelProperty( notes = "The MongoDb _id" )
     private String id;
-    @Schema(description = "Array with a pokemon's ability's")
+    @ApiModelProperty( notes = "Contains a pokemon's abilities" )
     private List<PokemonAbility> abilities;
-    @Schema(description = "A pokemon's base experience",example = "285")
+    @ApiModelProperty( notes = "The pokemon's base experience" )
     private Integer base_experience;
-    @Schema(description = "Array with a pokemon's forms")
+    @ApiModelProperty( notes = "Contains a pokemon's forms" )
     private List<NameAndUrl> forms;
+    @ApiModelProperty( notes = "Contains a pokemon's game indecencies" )
     private List<GameIndicy> game_indices;
-    @Schema(description = "The pokemon's height", example = "17")
+    @ApiModelProperty( notes = "The pokemon's height" )
     private Integer height;
-    @Schema(description = "Array with the items a pokemon possesses")
+    @ApiModelProperty( notes = "Contains a pokemon's items" )
     private List<PokemonItem> held_items;
-    @Schema(description = "Pokemon unique identifier id from PokeApi", example = "10034")
+    @ApiModelProperty( notes = "The pokemon's id on PokeApi" )
     private String poke_api_id;
-    @Schema(description = "Shows if the pokemon is default to the game or not")
+    @ApiModelProperty( notes = "If pokemon is default" )
     private Boolean is_default;
-    @Schema(description = "Url to the location the pokemon might be found in",
-            example = "https://pokeapi.co/api/v2/pokemon/10034/encounters")
+    @ApiModelProperty( notes = "Url to PokeApi's location_area_encounters" )
     private String location_area_encounters;
-    @Schema(description = "Array with all of the moves the pokemon has")
+    @ApiModelProperty( notes = "Contains a pokemon's moves" )
     private List<PokemonMove> moves;
-    @Schema(description = "The pokemon's name", example = "Charizard")
+    @ApiModelProperty( notes = "The pokemon's name" )
     private String name;
-    @Schema(description = "Array with all of the types the pokemon belongs to")
+    @ApiModelProperty( notes = "Contains a pokemon's types" )
     private List<PokemonType> types;
-    @Schema(description = "The pokemon's order in the in game pokedex", example = "9")
+    @ApiModelProperty( notes = "The pokemon's order" )
     private Integer order;
-    @Schema(description = "The pokemon's weight", example = "905")
+    @ApiModelProperty( notes = "The pokemon's weight" )
     private Integer weight;
 
     public Pokemon() {}

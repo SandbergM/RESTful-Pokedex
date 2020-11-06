@@ -2,12 +2,7 @@ package com.example.Pokedex.controllers;
 
 import com.example.Pokedex.entities.Pokemon;
 import com.example.Pokedex.services.PokemonService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,39 +20,30 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/pokemon")
-
+@Api( tags = "Pokemon Controller" )
 public class PokemonController {
 
     @Autowired
     private PokemonService pokemonService;
 
     @GetMapping( produces = "application/json" )
-    @Secured({"ROLE_ADMIN"})
-    @Operation(
-            summary = "Search for a pokemon",
-            description = "Search for an item, if no params are provided will preform a findAll",
-            tags = "pokemon"
-    )
+    @ApiOperation( value = "Search for a pokemon" )
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successful operation",
-                    content = @Content( array = @ArraySchema( schema = @Schema(implementation = Pokemon.class) ) ) ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Sorry, no matches found",
-                    content = @Content )
+            @ApiResponse( code = 200, message = "Ok" ),
+            @ApiResponse( code = 404, message = "Not found" )
     } )
     public ResponseEntity<List<Pokemon>> pokemonSearch(
-            @RequestParam( value="name", required = false, defaultValue = "" ) String name,
+            @ApiParam( value = "Used to search for a pokemon with full or partial name", required = false)
+            @RequestParam( value="name", required = false, defaultValue = "") String name,
+            @ApiParam( value = "Used to search for a pokemon belonging to a specific type", required = false)
             @RequestParam( value="type", required = false, defaultValue = "" ) String type,
-            @RequestParam( value="weight", required = false, defaultValue = "-1" ) Integer weight,
+            @ApiParam( value = "Used to search for a pokemon based on weight", required = false)
+            @RequestParam( value="weight", required = false, defaultValue = "-1") Integer weight,
+            @ApiParam( value = "Used to search for a pokemon based on height", required = false)
             @RequestParam( value="height", required = false, defaultValue = "-1" ) Integer height,
+            @ApiParam( value = "Used to search for a pokemon with a specific ability", required = false)
             @RequestParam( value="ability", required = false, defaultValue = "" ) String ability,
+            @ApiParam( value = "The page of results, 50 per page", required = false)
             @RequestParam( value="page", required = false, defaultValue = "1" ) Integer page
     ){
         var pokemon = pokemonService.pokemonSearch(name, type, weight, height, ability, page, true );
@@ -66,24 +52,11 @@ public class PokemonController {
 
     @PostMapping( consumes = "application/json", produces = "application/json" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
-    @Operation(
-            summary = "Save new pokemon to the database",
-            description = "Save a new pokemon to the database",
-            tags = "pokemon"
-    )
+    @ApiOperation( value = "Save new pokemon to the database" )
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successful operation",
-                    content = @Content( schema = @Schema(implementation = Pokemon.class) ) ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Full authentication is required to access this resource",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content),
+            @ApiResponse( code = 201, message = "Created" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
+            @ApiResponse( code = 403, message = "Forbidden" ),
     })
     public ResponseEntity<Pokemon> savePokemon(
             @RequestBody Pokemon pokemon
@@ -96,64 +69,34 @@ public class PokemonController {
     @PutMapping( consumes = "application/json", produces = "application/json" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(
-            summary = "Update a pokemon in the database",
-            description = "Update a pokemon in the database with a specific _id",
-            tags = "pokemon"
-    )
+    @ApiOperation( value = "Update a pokemon in the database" )
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Successful operation",
-                    content = @Content(  schema = @Schema(implementation = Pokemon.class) ) ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Full authentication is required to access this resource",
-                    content = @Content ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Couldn't find pokemon with that id",
-                    content = @Content )
+            @ApiResponse( code = 204, message = "No content" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
+            @ApiResponse( code = 403, message = "Forbidden" ),
+            @ApiResponse( code = 404, message = "Not found" )
     })
     public void updatePokemon(
             @RequestBody Pokemon pokemon,
+            @ApiParam( value = "The MongoDb _id of the pokemon you want to update", required = true)
             @RequestParam(value = "id", required = true) String id
     ){
         pokemonService.update(id, pokemon);
     }
 
 
-    @DeleteMapping( consumes = "application/json" )
+    @DeleteMapping()
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(
-            summary = "Remove a pokemon in the database",
-            description = "Remove a pokemon from the database with a specific _id",
-            tags = "pokemon"
-    )
+    @ApiOperation( value = "Remove a pokemon in the database" )
     @ApiResponses( value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Successful operation",
-                    content = @Content(  schema = @Schema(implementation = Pokemon.class) ) ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Full authentication is required to access this resource",
-                    content = @Content),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Couldn't find pokemon with that id",
-                    content = @Content)
+            @ApiResponse( code = 204, message = "No content" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
+            @ApiResponse( code = 403, message = "Forbidden" ),
+            @ApiResponse( code = 404, message = "Not found" )
     })
     public void deletePokemon(
+            @ApiParam( value = "The MongoDb _id of the pokemon you want to delete", required = true)
             @RequestParam(value = "id", required = true) String id
     ){
         pokemonService.delete(id);

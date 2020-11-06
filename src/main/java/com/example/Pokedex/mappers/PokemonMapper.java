@@ -4,6 +4,12 @@ import com.example.Pokedex.dto.PokemonDto;
 import com.example.Pokedex.entities.Pokemon;
 import org.mapstruct.Mapper;
 
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-11-03
+*/
+
 @Mapper
 public interface PokemonMapper {
     default Pokemon map(PokemonDto pokemonDto){

@@ -1,11 +1,5 @@
 package com.example.Pokedex.services;
 
-/*
-        <description>
-        @author Marcus Sandberg
-        @since 2020-11-03
-*/
-
 import com.example.Pokedex.dto.ItemDto;
 import com.example.Pokedex.entities.Item;
 import com.example.Pokedex.mappers.ItemMapper;
@@ -23,6 +17,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-11-03
+*/
 
 @Service
 public class ItemService {
@@ -75,7 +75,7 @@ public class ItemService {
     @CachePut(value = "itemCache", key = "#id")
     public void update(String id, Item item){
         if(itemRepo.findById(id).isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
         }
         itemRepo.save(item);
     }
@@ -83,7 +83,7 @@ public class ItemService {
     @CacheEvict(value = "itemCache", allEntries = true)
     public void delete(String id){
         if(itemRepo.findById(id).isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
         }
         itemRepo.deleteById(id);
     }

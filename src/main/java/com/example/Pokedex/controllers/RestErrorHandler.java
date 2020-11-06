@@ -11,6 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
         @author Marcus Sandberg
         @since 2020-10-25
 */
+
 @ControllerAdvice
 public class RestErrorHandler {
 

@@ -1,6 +1,5 @@
 package com.example.Pokedex.services;
 
-import com.example.Pokedex.dto.PokemonDto;
 import com.example.Pokedex.entities.Pokemon;
 import com.example.Pokedex.entities.PokemonAbility;
 import com.example.Pokedex.entities.PokemonType;
@@ -23,6 +22,7 @@ import java.util.*;
         @author Marcus Sandberg
         @since 2020-10-26
 */
+
 @Service
 public class PokemonService {
 
@@ -40,7 +40,6 @@ public class PokemonService {
 
     @Cacheable(value = "pokemonCache")
     public List<Pokemon> pokemonSearch(String name, String type, int weight, int height, String ability, int page, Boolean firstSearch) {
-
         var result = pokemonRepo.pokemonDatabaseCriteriaSearch(name, type, weight, height, ability, page)
                 .orElse(new ArrayList<>());
         // If (this is the first search or result doesn't have any pokemon's) and ( the result has less than 50 pokemon's )
@@ -62,7 +61,7 @@ public class PokemonService {
         }
 
         if (result.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, no matches found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found");
         }
 
         return result;
@@ -76,7 +75,7 @@ public class PokemonService {
     @CachePut(value = "pokemonCache", key = "#id")
     public void update(String id, Pokemon pokemon) {
         if (pokemonRepo.findById(id).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, couldn't find pokemon with that id");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
         }
         pokemonRepo.save(pokemon);
     }
@@ -84,7 +83,7 @@ public class PokemonService {
     @CacheEvict(value = "pokemonCache", allEntries = true)
     public void delete(String id) {
         if (pokemonRepo.findById(id).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, couldn't find pokemon with that id");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
         }
         pokemonRepo.deleteById(id);
     }

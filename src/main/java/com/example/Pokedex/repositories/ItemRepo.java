@@ -10,6 +10,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/*
+        <description>
+        @author Marcus Sandberg
+        @since 2020-11-03
+*/
+
 @Repository
 public class ItemRepo {
 

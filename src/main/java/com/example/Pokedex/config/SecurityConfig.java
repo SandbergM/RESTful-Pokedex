@@ -21,7 +21,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
         @since 2020-10-25
 */
 
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)

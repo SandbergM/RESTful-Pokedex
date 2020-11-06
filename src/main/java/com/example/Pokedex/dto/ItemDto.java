@@ -1,14 +1,14 @@
 package com.example.Pokedex.dto;
+
+import com.example.Pokedex.entities.NameAndUrl;
+
+import java.util.List;
+
 /*
         <description>
         @author Marcus Sandberg
         @since 2020-11-03
 */
-
-import com.example.Pokedex.entities.GameIndicy;
-import com.example.Pokedex.entities.NameAndUrl;
-
-import java.util.List;
 
 public class ItemDto {
 
