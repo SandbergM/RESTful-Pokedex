@@ -42,10 +42,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .formLogin().disable()
                 .authorizeRequests()
+                // GET("/") is left on permitAll() for presentational purpose, would be
+                // .authenticated() otherwise
+                .antMatchers(HttpMethod.GET, "/").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/pokemon").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/pokemon**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/item").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/item**").permitAll()
+                .antMatchers("/api**").authenticated()
                 .and()
                 .httpBasic().authenticationEntryPoint(entryPoint)
                 .and()

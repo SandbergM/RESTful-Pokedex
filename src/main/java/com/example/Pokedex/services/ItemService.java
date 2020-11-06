@@ -2,6 +2,7 @@ package com.example.Pokedex.services;
 
 import com.example.Pokedex.dto.ItemDto;
 import com.example.Pokedex.entities.Item;
+import com.example.Pokedex.entities.Pokemon;
 import com.example.Pokedex.mappers.ItemMapper;
 import com.example.Pokedex.repositories.ItemRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,22 +44,25 @@ public class ItemService {
 
         List<Item> result = itemRepo.itemDatabaseCriteriaSearch(name, minCost, maxCost, page).orElse(new ArrayList<>());
 
-        // If (this is the first search or result doesn't have any pokemon's) and ( the result has less than 50 pokemon's )
-        // if you only check if result is empty or not you could loose x amount of pokemon's in every search
-        // if i get at least 1 hit from the database, the result is a bit more traffic towards PokeApi, however
+        // If this is the first search and the result has less than 50 item's
+        // if you only check if result is empty or not you could loose x amount of item's in every search
         // the search results will be A LOT more accurate and return a lot more data
-        // I only fetch a list with all of the names of the items that are provided by PokeApi, but i only
-        // fetch the entire object if it matches a users search criteras
-        if( (firstSearch || result.isEmpty()) && result.size() < 50){
+        // The downside is that some requests might take a bit more time
+        if ( result.size() < 50 ) {
             var names = this.fetchItemNames();
-            for(String itemName : names){
-                if(itemName.contains(name) && !itemRepo.findOneWithName(itemName)){
-                    var itemDto = itemConsumerService.searchByName(itemName);
-                    var item = itemMapper.map(itemDto);
-                    result.add(this.save(item));
+            for (String itemName : names) {
+                if (itemName.contains(name)) {
+                    Item existingItem = itemRepo.findOneWithName(itemName).orElse( null );
+                    if(existingItem == null){
+                        var itemDto = itemConsumerService.searchByName(itemName);
+                        Item item = itemMapper.map(itemDto);
+                        this.save(item);
+                    }
                 }
             }
-            this.itemSearch(name, minCost, maxCost, page,false);
+            if(firstSearch){
+                this.itemSearch(name, minCost, maxCost, page,false);
+            }
         }
 
         if(result.isEmpty()){

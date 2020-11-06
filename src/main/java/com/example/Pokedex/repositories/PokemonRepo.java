@@ -44,9 +44,9 @@ public class PokemonRepo {
         return Optional.of(mongoTemplate.save(pokemon));
     }
 
-    public Boolean findOneWithName(String name){
+    public Optional<Pokemon> findOneWithName(String name){
         Query query = new Query().addCriteria(Criteria.where("name").is(name));
-        return mongoTemplate.findOne(query, Pokemon.class ) != null;
+        return Optional.ofNullable(mongoTemplate.findOne(query, Pokemon.class ));
     }
 
     public Optional<Pokemon> findById(String id){
@@ -57,5 +57,9 @@ public class PokemonRepo {
     public void deleteById(String id){
         Query query = new Query().addCriteria(Criteria.where("_id").is(id));
         mongoTemplate.findAndRemove(query, Pokemon.class);
+    }
+
+    public Optional<List<Pokemon>> findAll(){
+        return Optional.of(mongoTemplate.findAll(Pokemon.class));
     }
 }

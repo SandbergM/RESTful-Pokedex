@@ -1,8 +1,6 @@
 package com.example.Pokedex.services;
 
 import com.example.Pokedex.entities.Pokemon;
-import com.example.Pokedex.entities.PokemonAbility;
-import com.example.Pokedex.entities.PokemonType;
 import com.example.Pokedex.mappers.PokemonMapper;
 import com.example.Pokedex.repositories.PokemonRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,7 @@ public class PokemonService {
     private final RestTemplate restTemplate;
     private final PokemonConsumerService pokemonConsumerService;
 
-    public PokemonService(RestTemplateBuilder restTemplateBuilder, PokemonConsumerService pokemonConsumerService) {
+    public PokemonService( RestTemplateBuilder restTemplateBuilder, PokemonConsumerService pokemonConsumerService ) {
         this.restTemplate = restTemplateBuilder.build();
         this.pokemonConsumerService = pokemonConsumerService;
     }
@@ -42,22 +40,24 @@ public class PokemonService {
     public List<Pokemon> pokemonSearch(String name, String type, int weight, int height, String ability, int page, Boolean firstSearch) {
         var result = pokemonRepo.pokemonDatabaseCriteriaSearch(name, type, weight, height, ability, page)
                 .orElse(new ArrayList<>());
-        // If (this is the first search or result doesn't have any pokemon's) and ( the result has less than 50 pokemon's )
-        // if you only check if result is empty or not you could loose x amount of pokemon's in every search
-        // if i get at least 1 hit from the database, the result is a bit more traffic towards PokeApi, however
+        // If this is the first search and the result has less than 50 pokemon's
+        // If you only check if result is empty or not you could loose x amount of pokemon's in every search
         // the search results will be A LOT more accurate and return a lot more data
-        // I only fetch a list with all of the names of the pokemon's that are provided by PokeApi, but i only
-        // fetch the entire object if it matches a users search criteras
-        if ((firstSearch || result.isEmpty()) && result.size() < 50) {
+        // The downside is that some requests might take a bit more time
+        if ( result.size() < 50 ) {
             var names = this.fetchPokemonNames();
             for (String pokemonName : names) {
-                if (pokemonName.contains(name) && !pokemonRepo.findOneWithName(pokemonName)) {
-                    var pokemonDto = pokemonConsumerService.searchByName(pokemonName);
-                    Pokemon pokemon = pokemonMapper.map(pokemonDto);
-                    result.add(this.save(pokemon));
+                if(pokemonName.contains(name)){
+                    if(pokemonRepo.findOneWithName(pokemonName).isEmpty()){
+                        var pokemonDto = pokemonConsumerService.searchByName(pokemonName);
+                        Pokemon pokemon = pokemonMapper.map(pokemonDto);
+                        this.save(pokemon);
+                    }
                 }
             }
-            this.pokemonSearch(name, type, weight, height, ability, page, false);
+            if(firstSearch){
+                this.pokemonSearch(name, type, weight, height, ability, page, false);
+            }
         }
 
         if (result.isEmpty()) {
@@ -86,30 +86,6 @@ public class PokemonService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
         }
         pokemonRepo.deleteById(id);
-    }
-
-    // PokeAPI only support id / name(full) search, when a user does a search without a name this
-    // method checks any of the fetched pokemon's matches the criteria(weight, height, type, ability)
-    public boolean valueCheck(Pokemon pokemon, String type, int weight, int height, String ability) {
-        boolean hasCorrectType = type.equals("");
-        boolean hasCorrectWeight = pokemon.getWeight() == weight || weight == -1;
-        boolean hasCorrectHeight = pokemon.getWeight() == height || height == -1;
-        boolean hasCorrectAbility = ability.equals("");
-
-        for (PokemonAbility a : pokemon.getAbilities()) {
-            if (a.getAbility().getName().equalsIgnoreCase(ability)) {
-                hasCorrectAbility = true;
-                break;
-            }
-        }
-
-        for (PokemonType a : pokemon.getTypes()) {
-            if (a.getType().getName().equalsIgnoreCase(type)) {
-                hasCorrectType = true;
-                break;
-            }
-        }
-        return hasCorrectWeight && hasCorrectHeight && hasCorrectType && hasCorrectAbility;
     }
 
     // Fetch all of the pokemon-names from the API and store it in cache to lower the traffic to PokeAPI

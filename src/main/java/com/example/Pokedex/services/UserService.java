@@ -4,8 +4,8 @@ import com.example.Pokedex.entities.User;
 import com.example.Pokedex.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,39 +34,36 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public void updateUser(String id, User user) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String loggedInUsername = ((UserDetails)principal).getUsername();
-        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        boolean isAdmin = false;
+    public void updateUser(String id, User updatedUserProfile) {
+
+        var loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = loggedInUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
         User oldUserProfile = userRepo.findById(id).orElseThrow( () ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id)));
 
-        for(var role : roles){
-            System.out.println(role.getAuthority());
-            if(role.getAuthority().equals("ROLE_ADMIN")){
-                isAdmin = true;
-                break;
-            }
-        }
-
-        if( !oldUserProfile.getUsername().equals(loggedInUsername) ){
+        if( !oldUserProfile.getUsername().equals(loggedInUser.getName()) ) {
             if( !isAdmin ){
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
             }
         }
 
-        if(!oldUserProfile.getUsername().equals(user.getUsername())){
-            this.usernameAvailabilityCheck(user.getUsername());
+        // Checks to see if there's a request to change username
+        // If so, checks if the new username is available
+        if(!oldUserProfile.getUsername().equals(updatedUserProfile.getUsername())){
+            this.usernameAvailabilityCheck(updatedUserProfile.getUsername());
         }
-        if(!oldUserProfile.getEmail().equals(user.getEmail())){
-            this.emailAvailabilityCheck(user.getEmail());
+        // Checks to see if there's a request to change email
+        // If so, checks if the new email is free available
+        if(!oldUserProfile.getEmail().equals(updatedUserProfile.getEmail())){
+            this.emailAvailabilityCheck(updatedUserProfile.getEmail());
         }
 
-        if (!isAdmin) { user.setRoles( oldUserProfile.getRoles()); }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setId(id);
-        userRepo.save(user);
+        // Only admins are allowed to change the roles of an account
+        if (!isAdmin) { updatedUserProfile.setRoles( oldUserProfile.getRoles()); }
+
+        updatedUserProfile.setPassword(passwordEncoder.encode(updatedUserProfile.getPassword()));
+        updatedUserProfile.setId(id);
+        userRepo.save(updatedUserProfile);
     }
 
     public void deleteUser(String id) {
@@ -90,7 +87,7 @@ public class UserService {
 
         return users;
     }
-    // Only used in other methods that handle the status codes them self
+
     public User findByUsername(String username){
         return userRepo.findByUsername(username).orElseThrow( () ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", username)));
@@ -105,12 +102,6 @@ public class UserService {
     private void emailAvailabilityCheck(String email){
         if(userRepo.findUserByEmail(email).orElse( null ) != null){
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("Conflict, already in use %s", email));
-        }
-    }
-
-    private void idCheck(String id){
-        if(userRepo.findById(id).orElse( null ) != null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
         }
     }
 

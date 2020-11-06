@@ -54,9 +54,9 @@ public class ItemRepo {
         mongoTemplate.findAndRemove(query, Item.class);
     }
 
-    public Boolean findOneWithName(String name){
+    public Optional<Item> findOneWithName(String name){
         Query query = new Query().addCriteria(Criteria.where("name").is(name));
-        return mongoTemplate.findOne(query, Item.class ) != null;
+        return  Optional.ofNullable(mongoTemplate.findOne(query, Item.class ));
     }
 
 }

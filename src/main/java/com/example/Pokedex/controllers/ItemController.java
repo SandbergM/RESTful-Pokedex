@@ -50,7 +50,7 @@ public class ItemController {
     @ApiOperation(value = "Save new item to the database")
     @ApiResponses( value = {
             @ApiResponse( code = 201, message = "Created" ),
-            @ApiResponse( code = 401, message = "Bad credentials" ),
+            @ApiResponse( code = 401, message = "Unauthorized" ),
             @ApiResponse( code = 403, message = "Forbidden" ),
     })
     @PostMapping()
@@ -66,7 +66,7 @@ public class ItemController {
     @ApiOperation( value = "Update an item in the database" )
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "No content" ),
-            @ApiResponse( code = 401, message = "Bad credentials" ),
+            @ApiResponse( code = 401, message = "Unauthorized" ),
             @ApiResponse( code = 403, message = "Forbidden" ),
             @ApiResponse( code = 404, message = "Not found" )
     })
@@ -83,7 +83,7 @@ public class ItemController {
     @ApiOperation( value = "Remove an item from the database" )
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "No content" ),
-            @ApiResponse( code = 401, message = "Bad credentials" ),
+            @ApiResponse( code = 401, message = "Unauthorized" ),
             @ApiResponse( code = 403, message = "Forbidden" ),
             @ApiResponse( code = 404, message = "Not found" )
     })

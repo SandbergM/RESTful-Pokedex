@@ -11,5 +11,4 @@ import org.springframework.context.annotation.Configuration;
 
 @EnableCaching
 @Configuration
-public class CacheConfig {
-}
+public class CacheConfig { }
