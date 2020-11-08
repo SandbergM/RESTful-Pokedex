@@ -29,7 +29,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @ApiOperation( value = "Search for a user in the database with a specific username" )
+    @ApiOperation( value = "Search for a user in the database with a specific username ** Requires role Admin **" )
     @ApiResponses( value = {
             @ApiResponse( code = 200, message = "Successful operation" ),
             @ApiResponse( code = 401, message = "Bad credentials" ),
@@ -45,7 +45,7 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Search for a user in the database with a specific id")
+    @ApiOperation(value = "Search for a user in the database with a specific id ** Requires role Admin **")
     @ApiResponses( value = {
             @ApiResponse( code = 200, message = "Successful operation" ),
             @ApiResponse( code = 401, message = "Bad credentials" ),
@@ -61,7 +61,7 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @ApiOperation( value = "Register / Add a new account to the database")
+    @ApiOperation( value = "Register / Add a new account to the database ** Requires role Admin **")
     @ApiResponses( value = {
             @ApiResponse( code = 200, message = "Successful operation" ),
             @ApiResponse( code = 401, message = "Bad credentials" ),
@@ -74,7 +74,7 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(user));
     }
 
-    @ApiOperation( value = "Update / Put account in the database with a specific id")
+    @ApiOperation( value = "Update / Put account in the database with a specific id ** Requires role Admin or Editor **")
     @ApiResponses( value = {
             @ApiResponse( code = 201, message = "Successful operation" ),
             @ApiResponse( code = 400, message = "Bad Request" ),
@@ -93,7 +93,7 @@ public class UserController {
         userService.updateUser(id, user);
     }
 
-    @ApiOperation( value = "Delete / Remove account from the database with a specific id")
+    @ApiOperation( value = "Delete / Remove account from the database with a specific id ** Requires role Admin **")
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "Successful operation" ),
             @ApiResponse( code = 401, message = "Bad credentials" ),

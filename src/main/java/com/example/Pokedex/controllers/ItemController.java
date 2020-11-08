@@ -61,7 +61,7 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
-    @ApiOperation(value = "Save new item to the database")
+    @ApiOperation(value = "Save new item to the database ** Requires role Admin or Editor **")
     @ApiResponses( value = {
             @ApiResponse( code = 201, message = "Created" ),
             @ApiResponse( code = 401, message = "Unauthorized" ),
@@ -77,7 +77,7 @@ public class ItemController {
         return ResponseEntity.created(uri).body(savedItem);
     }
 
-    @ApiOperation( value = "Update an item in the database" )
+    @ApiOperation( value = "Update an item in the database ** Requires role Admin or Editor **" )
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "No content" ),
             @ApiResponse( code = 401, message = "Unauthorized" ),
@@ -94,7 +94,7 @@ public class ItemController {
         itemService.update(id, item);
     }
 
-    @ApiOperation( value = "Remove an item from the database" )
+    @ApiOperation( value = "Remove an item from the database || Requires role Admin or Editor" )
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "No content" ),
             @ApiResponse( code = 401, message = "Unauthorized" ),

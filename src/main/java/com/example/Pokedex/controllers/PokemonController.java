@@ -66,7 +66,7 @@ public class PokemonController {
 
     @PostMapping( consumes = "application/json", produces = "application/json" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
-    @ApiOperation( value = "Save new pokemon to the database" )
+    @ApiOperation( value = "Save new pokemon to the database ** Requires role Admin or Editor **" )
     @ApiResponses( value = {
             @ApiResponse( code = 201, message = "Created" ),
             @ApiResponse( code = 401, message = "Bad credentials" ),
@@ -83,7 +83,7 @@ public class PokemonController {
     @PutMapping( value = "/{id}", consumes = "application/json", produces = "application/json" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation( value = "Update a pokemon in the database" )
+    @ApiOperation( value = "Update a pokemon in the database ** Requires role Admin or Editor **" )
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "No content" ),
             @ApiResponse( code = 401, message = "Bad credentials" ),
@@ -102,7 +102,7 @@ public class PokemonController {
     @DeleteMapping( value = "/{id}" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation( value = "Remove a pokemon in the database" )
+    @ApiOperation( value = "Remove a pokemon in the database || Requires role Admin or Editor" )
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "No content" ),
             @ApiResponse( code = 401, message = "Bad credentials" ),
