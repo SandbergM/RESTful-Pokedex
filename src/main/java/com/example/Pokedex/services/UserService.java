@@ -93,6 +93,11 @@ public class UserService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", username)));
     }
 
+    public User findById(String id){
+        return userRepo.findById(id).orElseThrow( () ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id)));
+    }
+
     private void usernameAvailabilityCheck(String username){
         if(userRepo.findByUsername(username).orElse( null ) != null){
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("Conflict, already in use %s", username));

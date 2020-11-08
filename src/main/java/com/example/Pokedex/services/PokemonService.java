@@ -67,6 +67,14 @@ public class PokemonService {
         return result;
     }
 
+    public Pokemon pokemonSearchById(String id) {
+        Pokemon pokemon =  pokemonRepo.findById(id).orElse( null );
+        if(pokemon == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
+        }
+        return pokemon;
+    }
+
     @CacheEvict(value = "pokemonCache", key = "#result.id", allEntries = true)
     public Pokemon save(Pokemon pokemon) {
         return pokemonRepo.save(pokemon).orElse(null);

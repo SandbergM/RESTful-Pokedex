@@ -92,6 +92,14 @@ public class ItemService {
         itemRepo.deleteById(id);
     }
 
+    public Item searchById(String id){
+        Item item = itemRepo.findById(id).orElse( null );
+        if(item == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Not found %s", id));
+        }
+        return item;
+    }
+
     @Cacheable( value = "pokemonApiItemCache", key="#name")
     public List<String> fetchItemNames(){
         String URL = "https://pokeapi.co/api/v2/item/?limit=2000";

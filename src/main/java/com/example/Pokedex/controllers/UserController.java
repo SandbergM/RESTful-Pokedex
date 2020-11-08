@@ -22,34 +22,49 @@ import java.util.List;
 */
 
 @RestController
-@RequestMapping("/api/v1/users/")
+@RequestMapping("/api/v1/users")
 @Api( tags = "User Controller" )
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @ApiOperation(value = "Search for a user in the database with a specific username")
+    @ApiOperation( value = "Search for a user in the database with a specific username" )
     @ApiResponses( value = {
             @ApiResponse( code = 200, message = "Successful operation" ),
-            @ApiResponse( code = 401, message = "Full authentication is required to access this resource" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
             @ApiResponse( code = 403, message = "Forbidden"  ),
             @ApiResponse( code = 404, message = "Not found" )
     } )
     @GetMapping
     @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<List<User>> userSearch(
-            @RequestParam(required = false, defaultValue = "") String username
+    public ResponseEntity<List<User>> userSearchUsername(
+            @RequestParam( value = "username" ,required = false, defaultValue = "") String username
     ){
-        System.out.println("test");
         var users = userService.userSearch(username);
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Search for a user in the database with a specific id")
+    @ApiResponses( value = {
+            @ApiResponse( code = 200, message = "Successful operation" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
+            @ApiResponse( code = 403, message = "Forbidden"  ),
+            @ApiResponse( code = 404, message = "Not found" )
+    } )
+    @GetMapping( "/{id}" )
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<User> userSearchId(
+            @PathVariable( value = "id" ) String id
+    ){
+        var user = userService.findById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @ApiOperation( value = "Register / Add a new account to the database")
     @ApiResponses( value = {
             @ApiResponse( code = 200, message = "Successful operation" ),
-            @ApiResponse( code = 401, message = "Unauthorized" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
             @ApiResponse( code = 404, message = "Not found" ),
             @ApiResponse( code = 409, message = "Conflict, already in use" )
     } )
@@ -63,16 +78,16 @@ public class UserController {
     @ApiResponses( value = {
             @ApiResponse( code = 201, message = "Successful operation" ),
             @ApiResponse( code = 400, message = "Bad Request" ),
-            @ApiResponse( code = 401, message = "Unauthorized" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
             @ApiResponse( code = 403, message = "Forbidden" ),
             @ApiResponse( code = 404, message = "Not found" ),
             @ApiResponse( code = 409, message = "Conflict, already in use" )
     } )
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUser(
-            @PathVariable String id,
+            @PathVariable( value = "id") String id,
             @Validated @RequestBody User user
     ){
         userService.updateUser(id, user);
@@ -81,15 +96,15 @@ public class UserController {
     @ApiOperation( value = "Delete / Remove account from the database with a specific id")
     @ApiResponses( value = {
             @ApiResponse( code = 204, message = "Successful operation" ),
-            @ApiResponse( code = 401, message = "Unauthorized" ),
+            @ApiResponse( code = 401, message = "Bad credentials" ),
             @ApiResponse( code = 403, message = "Forbidden" ),
             @ApiResponse( code = 404, message = "Not found" )
     } )
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(
-            @PathVariable String id
+            @PathVariable( value = "id" ) String id
     ){
         userService.deleteUser(id);
     }

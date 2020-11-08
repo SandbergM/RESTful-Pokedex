@@ -50,6 +50,20 @@ public class PokemonController {
         return ResponseEntity.ok(pokemon);
     }
 
+    @GetMapping( value = "/{id}", produces = "application/json" )
+    @ApiOperation( value = "Search for a pokemon with id" )
+    @ApiResponses( value = {
+            @ApiResponse( code = 200, message = "Ok" ),
+            @ApiResponse( code = 404, message = "Not found" )
+    } )
+    public ResponseEntity<Pokemon> pokemonSearchById(
+            @ApiParam( value = "Used to search for a pokemon with a specific id", required = true)
+            @PathVariable( value="id" ) String id
+    ){
+        var pokemon = pokemonService.pokemonSearchById(id);
+        return ResponseEntity.ok(pokemon);
+    }
+
     @PostMapping( consumes = "application/json", produces = "application/json" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ApiOperation( value = "Save new pokemon to the database" )
@@ -66,7 +80,7 @@ public class PokemonController {
         return ResponseEntity.created(uri).body(savedPokemon);
     }
 
-    @PutMapping( consumes = "application/json", produces = "application/json" )
+    @PutMapping( value = "/{id}", consumes = "application/json", produces = "application/json" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation( value = "Update a pokemon in the database" )
@@ -79,13 +93,13 @@ public class PokemonController {
     public void updatePokemon(
             @RequestBody Pokemon pokemon,
             @ApiParam( value = "The MongoDb _id of the pokemon you want to update", required = true)
-            @RequestParam(value = "id", required = true) String id
+            @PathVariable( value = "id" ) String id
     ){
         pokemonService.update(id, pokemon);
     }
 
 
-    @DeleteMapping()
+    @DeleteMapping( value = "/{id}" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation( value = "Remove a pokemon in the database" )
@@ -97,7 +111,7 @@ public class PokemonController {
     })
     public void deletePokemon(
             @ApiParam( value = "The MongoDb _id of the pokemon you want to delete", required = true)
-            @RequestParam(value = "id", required = true) String id
+            @PathVariable( value = "id" ) String id
     ){
         pokemonService.delete(id);
     }

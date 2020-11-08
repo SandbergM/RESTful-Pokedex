@@ -47,6 +47,20 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
+    @GetMapping( value = "{id}", produces = "application/json" )
+    @ApiOperation( value = "Search for an item with a specific id" )
+    @ApiResponses( value = {
+            @ApiResponse( code = 200, message = "Ok" ),
+            @ApiResponse( code = 404, message = "Not found" )
+    } )
+    public ResponseEntity<Item> itemSearchId(
+            @ApiParam( value = "Used to search for an item with a specific id", required = false)
+            @PathVariable( value = "id" ) String id
+    ){
+        var item = itemService.searchById(id);
+        return ResponseEntity.ok(item);
+    }
+
     @ApiOperation(value = "Save new item to the database")
     @ApiResponses( value = {
             @ApiResponse( code = 201, message = "Created" ),
@@ -70,12 +84,12 @@ public class ItemController {
             @ApiResponse( code = 403, message = "Forbidden" ),
             @ApiResponse( code = 404, message = "Not found" )
     })
-    @PutMapping( consumes = "application/json", produces = "application/json" )
+    @PutMapping( value = "/{id}", consumes = "application/json", produces = "application/json" )
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateItem(
             @RequestBody Item item,
             @ApiParam( value = "The MongoDb _id of the item you want to update", required = true)
-            @RequestParam(value = "id", required = true) String id
+            @PathVariable( value = "id") String id
     ){
         itemService.update(id, item);
     }
@@ -87,7 +101,7 @@ public class ItemController {
             @ApiResponse( code = 403, message = "Forbidden" ),
             @ApiResponse( code = 404, message = "Not found" )
     })
-    @DeleteMapping( consumes = "application/json" )
+    @DeleteMapping( value = "/{id}", consumes = "application/json" )
     @Secured({"ROLE_ADMIN", "ROLE_EDITOR"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteItem(
